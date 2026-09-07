@@ -1,0 +1,59 @@
+{
+  "name": "embedded-stack-usage-companion",
+  "displayName": "Embedded Stack Usage Companion",
+  "description": "Parses GCC .su stack-usage files (-fstack-usage) and flags any function over a configurable stack budget. No data leaves your editor.",
+  "version": "0.1.0",
+  "publisher": "GapHunterLabs",
+  "icon": "images/icon.png",
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Linters"
+  ],
+  "keywords": [
+    "embedded",    "c",    "stack-usage",    "gcc"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GapHunterLabs/vscode-embedded-stack-usage-companion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GapHunterLabs/vscode-embedded-stack-usage-companion/issues"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "embeddedStackUsageCompanion.rescan",
+        "title": "Embedded Stack Usage Companion: Rescan"
+      }
+    ],
+    "configuration": {
+      "title": "Embedded Stack Usage Companion",
+      "properties": {
+        "embeddedStackUsageCompanion.budgetBytes": {
+          "type": "number",
+          "default": 512,
+          "description": "Flag a function whose own stack frame (per GCC's -fstack-usage .su output) exceeds this many bytes."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./",
+    "test": "tsc -p ./ && node --test \"out/test/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.2"
+  }
+}
