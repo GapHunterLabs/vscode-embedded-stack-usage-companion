@@ -2,7 +2,7 @@
   "name": "embedded-stack-usage-companion",
   "displayName": "Embedded Stack Usage Companion",
   "description": "Parses GCC .su stack-usage files (-fstack-usage) and flags any function over a configurable stack budget. No data leaves your editor.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "GapHunterLabs",
   "icon": "images/icon.png",
   "license": "Apache-2.0",
