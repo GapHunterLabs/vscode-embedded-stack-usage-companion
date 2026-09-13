@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { parseSuFile, findBudgetViolations } from './stackUsage';
+import { recordHit } from './reviewPrompt';
 
 let diagnostics: vscode.DiagnosticCollection;
 
@@ -7,7 +8,7 @@ function getBudgetBytes(): number {
   return vscode.workspace.getConfiguration('embeddedStackUsageCompanion').get<number>('budgetBytes', 512);
 }
 
-async function refreshWorkspace(): Promise<void> {
+async function refreshWorkspace(context: vscode.ExtensionContext): Promise<void> {
   const folders = vscode.workspace.workspaceFolders;
   if (!folders || folders.length === 0) return;
   const root = folders[0].uri;
@@ -54,6 +55,7 @@ async function refreshWorkspace(): Promise<void> {
         vscode.DiagnosticSeverity.Warning,
       );
       diagnostic.source = 'Embedded Stack Usage Companion';
+      recordHit(context, `${key}:${line}`);
       const list = byResolvedUri.get(key) ?? [];
       list.push(diagnostic);
       byResolvedUri.set(key, list);
@@ -70,18 +72,18 @@ export function activate(context: vscode.ExtensionContext): void {
   diagnostics = vscode.languages.createDiagnosticCollection('embeddedStackUsageCompanion');
   context.subscriptions.push(diagnostics);
 
-  void refreshWorkspace();
+  void refreshWorkspace(context);
 
   const watcher = vscode.workspace.createFileSystemWatcher('**/*.su');
   context.subscriptions.push(
     watcher,
-    watcher.onDidChange(() => void refreshWorkspace()),
-    watcher.onDidCreate(() => void refreshWorkspace()),
-    watcher.onDidDelete(() => void refreshWorkspace()),
+    watcher.onDidChange(() => void refreshWorkspace(context)),
+    watcher.onDidCreate(() => void refreshWorkspace(context)),
+    watcher.onDidDelete(() => void refreshWorkspace(context)),
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('embeddedStackUsageCompanion.budgetBytes')) void refreshWorkspace();
+      if (event.affectsConfiguration('embeddedStackUsageCompanion.budgetBytes')) void refreshWorkspace(context);
     }),
-    vscode.commands.registerCommand('embeddedStackUsageCompanion.rescan', () => void refreshWorkspace()),
+    vscode.commands.registerCommand('embeddedStackUsageCompanion.rescan', () => void refreshWorkspace(context)),
   );
 }
 
